@@ -1,0 +1,3 @@
+large_files:
+  - path: "models/model.pt"
+    url: "https://zenodo.org/record/7616221/files/model.pt?download=1"
