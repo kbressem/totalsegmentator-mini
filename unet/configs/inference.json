@@ -1,0 +1,149 @@
+{
+    "imports": [
+        "$import glob",
+        "$import scripts",
+        "$from scripts.utils import get_datalist",
+        "$from scripts.utils import num_workers"
+    ],
+    "input_channels": 1,
+    "output_channels": 105,
+    "bundle_root": "/home/bressekk/monailabel/my_apps/monaibundle/model/totalsegmentator_mini",
+    "output_dir": "$@bundle_root + '/eval'",
+    "datalist": "$['/home/bressekk/monailabel/datasets/test/ct.nrrd']",
+    "device": "$torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')",
+    "network": "$@network_def.to(@device)",
+    "image_key": "image",
+    "network_def": {
+        "_target_": "monai.networks.nets.UNet",
+        "spatial_dims": 3,
+        "in_channels": "@input_channels",
+        "out_channels": "@output_channels",
+        "channels": [
+            64,
+            128,
+            256,
+            512
+        ],
+        "strides": [
+            2,
+            2,
+            2
+        ],
+        "num_res_units": 3
+    },
+    "preprocessing": {
+        "_target_": "Compose",
+        "transforms": [
+            {
+                "_target_": "LoadImaged",
+                "keys": "@image_key"
+            },
+            {
+                "_target_": "EnsureChannelFirstd",
+                "keys": "@image_key"
+            },
+            {
+                "_target_": "Spacingd",
+                "keys": "@image_key",
+                "pixdim": [
+                    3,
+                    3,
+                    3
+                ],
+                "mode": "bilinear",
+                "align_corners": true
+            },
+            {
+                "_target_": "scripts.transforms.ApplyWindowingd",
+                "keys": "@image_key",
+                "lower": -450,
+                "upper": 600
+            },
+            {
+                "_target_": "CastToTyped",
+                "keys": "@image_key",
+                "dtype": "$torch.float32"
+            },
+            {
+                "_target_": "NormalizeIntensityd",
+                "keys": "@image_key"
+            },
+            {
+                "_target_": "ScaleIntensityd",
+                "keys": "@image_key",
+                "minv": 0,
+                "maxv": 1
+            }
+        ]
+    },
+    "dataset": {
+        "_target_": "Dataset",
+        "data": "@datalist",
+        "transform": "@preprocessing"
+    },
+    "dataloader": {
+        "_target_": "DataLoader",
+        "dataset": "@dataset",
+        "batch_size": 1,
+        "shuffle": false,
+        "num_workers": 4
+    },
+    "inferer": {
+        "_target_": "SlidingWindowInferer",
+        "roi_size": [
+            64,
+            64,
+            64
+        ],
+        "sw_batch_size": 4,
+        "overlap": 0.625
+    },
+    "postprocessing": {
+        "_target_": "Compose",
+        "transforms": [
+            {
+                "_target_": "EnsureTyped",
+                "keys": "pred"
+            },
+            {
+                "_target_": "AsDiscreted",
+                "keys": "pred",
+                "argmax": true
+            },
+            {
+                "_target_": "SaveImaged",
+                "keys": "pred",
+                "resample": true,
+                "meta_keys": "pred_meta_dict",
+                "output_dir": "@output_dir"
+            }
+        ]
+    },
+    "handlers": [
+        {
+            "_target_": "CheckpointLoader",
+            "load_path": "$@bundle_root + '/models/model.ts'",
+            "load_dict": {
+                "network": "@network"
+            }
+        },
+        {
+            "_target_": "StatsHandler",
+            "iteration_log": false
+        }
+    ],
+    "evaluator": {
+        "_target_": "SupervisedEvaluator",
+        "device": "@device",
+        "val_data_loader": "@dataloader",
+        "network": "@network",
+        "inferer": "@inferer",
+        "postprocessing": "@postprocessing",
+        "val_handlers": "@handlers",
+        "amp": true
+    },
+    "evaluating": [
+        "$setattr(torch.backends.cudnn, 'benchmark', True)",
+        "$@evaluator.run()"
+    ]
+}
