@@ -1,15 +1,15 @@
 ---
 imports:
-- "$import glob"
-- "$import scripts"
-- "$from scripts.utils import get_datalist"
-- "$from scripts.utils import num_workers"
-- "$from scripts.utils import parse_data_for_inference"
-- "$from scripts.utils import adapt_filename"
+  - "$import glob"
+  - "$import scripts"
+  - "$from scripts.utils import get_datalist"
+  - "$from scripts.utils import num_workers"
+  - "$from scripts.utils import parse_data_for_inference"
+  - "$from scripts.utils import adapt_filename"
 input_channels: 1
 output_channels: 105
 ckpt_path: "models/model.pt"
-bundle_root: "/home/bressekk/totalsegmentator/bundle/unet/"
+bundle_root: "/Users/keno/Documents/GitHub/totalsegmentator-mini/totalsegmentator_mini/"
 output_dir: "$@bundle_root + 'eval'"
 datadir: "$None"
 datalist: "$parse_data_for_inference(@datadir) or get_datalist('test')[0:1]"
@@ -27,31 +27,31 @@ network_def:
 preprocessing:
   _target_: Compose
   transforms:
-  - _target_: LoadImaged
-    keys: "@image_key"
-  - _target_: EnsureChannelFirstd
-    keys: "@image_key"
-  - _target_: Spacingd
-    keys: "@image_key"
-    pixdim:
-    - 3
-    - 3
-    - 3
-    mode: bilinear
-    align_corners: true
-  - _target_: scripts.transforms.ApplyWindowingd
-    keys: "@image_key"
-    lower: -450
-    upper: 600
-  - _target_: CastToTyped
-    keys: "@image_key"
-    dtype: "$torch.float32"
-  - _target_: NormalizeIntensityd
-    keys: "@image_key"
-  - _target_: ScaleIntensityd
-    keys: "@image_key"
-    minv: 0
-    maxv: 1
+    - _target_: LoadImaged
+      keys: "@image_key"
+    - _target_: EnsureChannelFirstd
+      keys: "@image_key"
+    - _target_: Spacingd
+      keys: "@image_key"
+      pixdim:
+        - 3
+        - 3
+        - 3
+      mode: bilinear
+      align_corners: true
+    - _target_: scripts.transforms.ApplyWindowingd
+      keys: "@image_key"
+      lower: -450
+      upper: 600
+    - _target_: CastToTyped
+      keys: "@image_key"
+      dtype: "$torch.float32"
+    - _target_: NormalizeIntensityd
+      keys: "@image_key"
+    - _target_: ScaleIntensityd
+      keys: "@image_key"
+      minv: 0
+      maxv: 1
 dataset:
   _target_: Dataset
   data: "@datalist"
@@ -65,34 +65,36 @@ dataloader:
 inferer:
   _target_: SlidingWindowInferer
   roi_size:
-  - 64
-  - 64
-  - 64
-  sw_batch_size: 4
-  overlap: 0.625
+    - 64
+    - 64
+    - 64
+  sw_batch_size: 8
+  overlap: 0.25
+  progress: True
 postprocessing:
   _target_: Compose
   transforms:
-  - _target_: EnsureTyped
-    keys: pred
-  - _target_: AsDiscreted
-    keys: pred
-    argmax: true
-  - _target_: Lambdad
-    keys: pred
-    func: "$adapt_filename"
-  - _target_: SaveImaged
-    keys: pred
-    output_dir: "@output_dir"
-    resample: True
-    output_postfix: pred
+    - _target_: EnsureTyped
+      keys: pred
+    - _target_: AsDiscreted
+      keys: pred
+      argmax: true
+    - _target_: Lambdad
+      keys: pred
+      func: "$adapt_filename"
+    - _target_: SaveImaged
+      keys: pred
+      output_dir: "@output_dir"
+      resample: True
+      output_postfix: pred
 handlers:
-- _target_: CheckpointLoader
-  load_path: "$@bundle_root + @ckpt_path"
-  load_dict:
-    network: "@network"
-- _target_: StatsHandler
-  iteration_log: false
+  - _target_: CheckpointLoader
+    load_path: "$@bundle_root + @ckpt_path"
+    map_location: "@device"
+    load_dict:
+      network: "@network"
+  - _target_: StatsHandler
+    iteration_log: false
 evaluator:
   _target_: SupervisedEvaluator
   device: "@device"
@@ -103,5 +105,5 @@ evaluator:
   val_handlers: "@handlers"
   amp: true
 evaluating:
-- "$setattr(torch.backends.cudnn, 'benchmark', True)"
-- "$@evaluator.run()"
+  - "$setattr(torch.backends.cudnn, 'benchmark', True)"
+  - "$@evaluator.run()"
