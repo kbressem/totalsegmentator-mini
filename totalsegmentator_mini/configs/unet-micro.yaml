@@ -1,0 +1,11 @@
+output_dir: "$@bundle_root + 'eval_micro'"
+bundle_root: "/home/bressekk/totalsegmentator/bundle/unet/"
+cache_dir: "/sc-scratch/sc-scratch-dha/segmentator_cache_unet_mini"
+network_def:
+  _target_: monai.networks.nets.UNet
+  spatial_dims: 3
+  in_channels: "@input_channels"
+  out_channels: "@output_channels"
+  channels: [32, 64, 128, 256]
+  strides: [2, 2, 2]
+  num_res_units: 2
