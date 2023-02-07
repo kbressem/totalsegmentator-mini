@@ -8,7 +8,7 @@ imports:
 - "$from scripts.utils import adapt_filename"
 input_channels: 1
 output_channels: 105
-ckpt_path: "/models/model.pt"
+ckpt_path: "models/model.pt"
 bundle_root: "/home/bressekk/totalsegmentator/bundle/unet/"
 output_dir: "$@bundle_root + 'eval'"
 datadir: "$None"
