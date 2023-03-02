@@ -9,7 +9,7 @@ imports:
 input_channels: 1
 output_channels: 105
 ckpt_path: "models/model.pt"
-bundle_root: "/Users/keno/Documents/GitHub/totalsegmentator-mini/totalsegmentator_mini/"
+bundle_root: "./"
 output_dir: "$@bundle_root + 'eval'"
 datadir: "$None"
 datalist: "$parse_data_for_inference(@datadir) or get_datalist('test')[0:1]"
