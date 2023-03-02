@@ -244,7 +244,7 @@ validate:
 #    metric_details: "*"
 #    delimiter: ","
 # - _target_: scripts.handlers.PushnotificationHandler
-#    credentials: "/home/bressekk/.pushover_credentials.yaml"
+#    credentials: ".pushover_credentials.yaml"
 #    identifier: "UNET Total Segemntator"
   key_metric:
     val_mean_dice:
