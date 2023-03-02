@@ -8,7 +8,7 @@ imports:
 input_channels: 1
 output_channels: 105
 ckpt_path: "/models/model.pt"
-bundle_root: "/home/bressekk/totalsegmentator/bundle/unet/"
+bundle_root: "./"
 output_dir: "$@bundle_root + 'eval'"
 datalist: "$get_datalist('test')"
 device: "$torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')"
