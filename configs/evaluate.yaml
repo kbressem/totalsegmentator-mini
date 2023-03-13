@@ -1,10 +1,10 @@
 ---
 imports:
-- "$import glob"
-- "$import scripts"
-- "$from scripts.utils import get_datalist"
-- "$from scripts.utils import num_workers"
-- "$from scripts.utils import get_meta_dict"
+  - "$import glob"
+  - "$import scripts"
+  - "$from scripts.utils import get_datalist"
+  - "$from scripts.utils import num_workers"
+  - "$from scripts.utils import get_meta_dict"
 input_channels: 1
 output_channels: 105
 ckpt_path: "/models/model.pt"
@@ -26,45 +26,45 @@ network_def:
 preprocessing:
   _target_: Compose
   transforms:
-  - _target_: LoadImaged
-    keys:
-    - "@image_key"
-    - "@label_key"
-  - _target_: EnsureChannelFirstd
-    keys:
-    - "@image_key"
-    - "@label_key"
-  - _target_: Spacingd
-    keys:
-    - "@image_key"
-    - "@label_key"
-    pixdim:
-    - 3
-    - 3
-    - 3
-    mode:
-    - bilinear
-    - nearest
-    align_corners:
-    - true
-    - true
-  - _target_: scripts.transforms.MatchSized
-    keys: "@label_key"
-    reference_key: "@image_key"
-    mode: nearest
-  - _target_: scripts.transforms.ApplyWindowingd
-    keys: "@image_key"
-    lower: -450
-    upper: 600
-  - _target_: CastToTyped
-    keys: "@image_key"
-    dtype: "$torch.float32"
-  - _target_: NormalizeIntensityd
-    keys: "@image_key"
-  - _target_: ScaleIntensityd
-    keys: "@image_key"
-    minv: 0
-    maxv: 1
+    - _target_: LoadImaged
+      keys:
+        - "@image_key"
+        - "@label_key"
+    - _target_: EnsureChannelFirstd
+      keys:
+        - "@image_key"
+        - "@label_key"
+    - _target_: Spacingd
+      keys:
+        - "@image_key"
+        - "@label_key"
+      pixdim:
+        - 3
+        - 3
+        - 3
+      mode:
+        - bilinear
+        - nearest
+      align_corners:
+        - true
+        - true
+    - _target_: scripts.transforms.MatchSized
+      keys: "@label_key"
+      reference_key: "@image_key"
+      mode: nearest
+    - _target_: scripts.transforms.ApplyWindowingd
+      keys: "@image_key"
+      lower: -450
+      upper: 600
+    - _target_: CastToTyped
+      keys: "@image_key"
+      dtype: "$torch.float32"
+    - _target_: NormalizeIntensityd
+      keys: "@image_key"
+    - _target_: ScaleIntensityd
+      keys: "@image_key"
+      minv: 0
+      maxv: 1
 dataset:
   _target_: Dataset
   data: "@datalist"
@@ -78,9 +78,9 @@ dataloader:
 inferer:
   _target_: SlidingWindowInferer
   roi_size:
-  - 64
-  - 64
-  - 64
+    - 64
+    - 64
+    - 64
   sw_batch_size: 4
   overlap: 0.625
   progress: true
@@ -89,26 +89,26 @@ postprocessing:
   transforms:
     - _target_: AsDiscreted
       keys:
-      - pred
-      - "@label_key"
+        - pred
+        - "@label_key"
       argmax:
-      - true
-      - false
+        - true
+        - false
       to_onehot: "@output_channels"
 handlers:
-- _target_: CheckpointLoader
-  load_path: "$@bundle_root + @ckpt_path"
-  load_dict:
-    network: "@network"
-- _target_: StatsHandler
-  iteration_log: false
-- _target_: MetricsSaver
-  save_dir: "@output_dir"
-  metric_details: "*"
-  delimiter: ","
-  batch_transform: "$get_meta_dict(@image_key)"
-metrics: 
-  MeanDice: 
+  - _target_: CheckpointLoader
+    load_path: "$@bundle_root + @ckpt_path"
+    load_dict:
+      network: "@network"
+  - _target_: StatsHandler
+    iteration_log: false
+  - _target_: MetricsSaver
+    save_dir: "@output_dir"
+    metric_details: "*"
+    delimiter: ","
+    batch_transform: "$get_meta_dict(@image_key)"
+metrics:
+  MeanDice:
     _target_: MeanDice
     include_background: false
     output_transform: "$monai.handlers.from_engine(['pred', 'label'])"
@@ -123,5 +123,5 @@ evaluator:
   val_handlers: "@handlers"
   amp: true
 evaluating:
-- "$setattr(torch.backends.cudnn, 'benchmark', True)"
-- "$@evaluator.run()"
+  - "$setattr(torch.backends.cudnn, 'benchmark', True)"
+  - "$@evaluator.run()"

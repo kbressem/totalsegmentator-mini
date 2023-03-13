@@ -8,12 +8,13 @@ Totalsegmentator Mini is a small-scale clone of [Totalsegmentator](https://githu
 ## Inference
 
 ```bash
-python -m monai.bundle run evaluating \
+python -m monai.bundle run inference \
   --meta_file configs/metadata.yaml \
   --config_file configs/inference.yaml \
   --logging_file configs/logging.conf
+  --datadir <path_to_file_or_folder>
 ```
-To run inference on a single file or a dicretory containing multiple image files use the `--datadir` flag
+To run inference on a single file or a directory containing multiple image files use the `--datadir` flag
 
 ## Evaluation
 
@@ -23,11 +24,10 @@ python -m monai.bundle run evaluating \
   --config_file configs/evaluate.yaml \
   --logging_file configs/logging.conf
 ```
-To run inference on a single file or a dicretory containing multiple image files use the `--datadir` flag
 
 ## Training
 
-During training, Totalsegmentator Mini saves both the model weights and the optimizer in `model.pt`, which can be problematic if deployed in MONAI Label. To separate them, use scripts/separate_model_optim.py.
+During training, this bundle saves both, the model weights AND the optimizer in `model.pt`. This can be an issue, e.g. if deployed in MONAI Label. Use `scripts/separate_model_optim.py` to separate them. 
 
 ### Single GPU training
 

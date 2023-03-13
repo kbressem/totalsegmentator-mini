@@ -79,8 +79,8 @@ def parse_data_for_inference(fn_or_dir: str = None) -> Union[None, Dict]:
         }]
     
     elif os.path.isdir(fn_or_dir):
-        files = [fn for fn in os.listdir(fn_or_dir) if any([fn.endswith(ext) for ext in IMAGE_FILES])]
-        data_dict = [{"image": os.path.join(fn_or_dir, fn)} for fn in files]
+        files = [os.path.join(fn_or_dir, fn) for fn in os.listdir(fn_or_dir) if any([fn.endswith(ext) for ext in IMAGE_FILES])]
+        data_dict = [{"image": fn} for fn in files]
         
     else:
         raise FileNotFoundError(fn_or_dir)
