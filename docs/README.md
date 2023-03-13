@@ -4,6 +4,8 @@ Totalsegmentator Mini is a small-scale clone of [Totalsegmentator](https://githu
 
 <img src="https://user-images.githubusercontent.com/37253540/216309343-ab6e3d64-2f13-43b4-93c0-4fa85e8e57fa.png"  width="300" height="300">
 
+This model was trained on the TotalSegmentator dataset as well as on 3500 additional abdominal CT scans, which were first segmented by the full TotalSegmentator model. 
+
 ## Overview of bundle commands
 ### Inference
 
