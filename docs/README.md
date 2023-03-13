@@ -18,7 +18,7 @@ python -m monai.bundle run inference \
 ```
 To run inference on a single file or a directory containing multiple image files use the `--dataset_dir` flag. 
 Nested directories are not supported.   
-To control where the files are stored, overwrite the output directory with the `--outout_dir` flag. 
+To control where the files are stored, overwrite the output directory with the `--output_dir` flag. 
 
 ### Evaluation
 Evaluate the model on the official total segmentator training data (you need to download the data and adapt the paths beforehand). 
