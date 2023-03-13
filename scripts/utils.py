@@ -54,16 +54,9 @@ def num_workers() -> int:
     return n_workers
 
 def get_datalist(split: str) -> Dict[str, str]: 
-
-    if split in ["train", "valid", "test"]: 
-        df = pd.read_csv(f"/sc-projects/sc-proj-dha/Niere/segmentator_{split}.csv")
-    else: 
-        raise ValueError("Split must be `train`, `valid` or `test`")
-    
-    df["image"] = [f"/sc-projects/sc-proj-dha/{fn}" for fn in df.image]
-    df["label"] = [f"/sc-projects/sc-proj-dha/{fn}" for fn in df.label]
-    data_list = df.to_dict("records")
-    return data_list
+    # This is an empty function and not relevant for the challenge.
+    # It was used as a convenient wrapper to get the data paths during training
+    return []
 
 IMAGE_FILES = [".nii", ".nii.gz", ".nrrd", ".dcm"]
 
@@ -79,7 +72,7 @@ def parse_data_for_inference(fn_or_dir: str = None) -> Union[None, Dict]:
         }]
     
     elif os.path.isdir(fn_or_dir):
-        files = [os.path.join(fn_or_dir, fn) for fn in os.listdir(fn_or_dir) if any([fn.endswith(ext) for ext in IMAGE_FILES])]
+        files = [fn for fn in os.listdir(fn_or_dir) if any([fn.endswith(ext) for ext in IMAGE_FILES])]
         data_dict = [{"image": fn} for fn in files]
         
     else:

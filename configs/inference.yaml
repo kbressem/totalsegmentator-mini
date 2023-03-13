@@ -1,13 +1,10 @@
 ---
 imports:
-  - "$import glob"
   - "$import scripts"
-  - "$from scripts.utils import get_datalist"
-  - "$from scripts.utils import num_workers"
   - "$from scripts.utils import parse_data_for_inference"
   - "$from scripts.utils import adapt_filename"
 input_channels: 1
-output_channels: 105
+output_channels: 104
 ckpt_path: "models/model.pt"
 bundle_root: "./"
 output_dir: "$@bundle_root + 'eval'"
@@ -50,7 +47,7 @@ preprocessing:
       keys: "@image_key"
     - _target_: ScaleIntensityd
       keys: "@image_key"
-      minv: 0
+      minv: -1
       maxv: 1
 dataset:
   _target_: Dataset
@@ -82,18 +79,7 @@ postprocessing:
     - _target_: Lambdad
       keys: pred
       func: "$adapt_filename"
-    - _target_: SaveImaged
-      keys: pred
-      output_dir: "@output_dir"
-      resample: True
-      separate_folder: false
-      output_postfix: pred
 handlers:
-  - _target_: CheckpointLoader
-    load_path: "$@bundle_root + @ckpt_path"
-    map_location: "@device"
-    load_dict:
-      network: "@network"
   - _target_: StatsHandler
     iteration_log: false
 evaluator:
@@ -105,6 +91,6 @@ evaluator:
   postprocessing: "@postprocessing"
   val_handlers: "@handlers"
   amp: true
-inference:
+inferenze:
   - "$setattr(torch.backends.cudnn, 'benchmark', True)"
   - "$@evaluator.run()"

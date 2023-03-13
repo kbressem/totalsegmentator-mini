@@ -118,38 +118,3 @@ class ApplyWindowingd(transforms.MapTransform):
             d[key] = self.windowing(d[key])
         return d
 
-    
-class MatchSized(transforms.MapTransform):
-    """Match size of item to the size of a reference item"""
-    
-    def __init__(self, keys: KeysCollection, reference_key: str, mode: str, allow_missing_keys: bool = False, **kwargs) -> None: 
-        self.mode = mode
-        self.reference_key = reference_key
-        self.resize_kwargs = kwargs
-        super().__init__(keys=keys, allow_missing_keys=allow_missing_keys)
-        
-    def __call__(self, data: Mapping[Hashable, NdarrayOrTensor]) -> Dict[Hashable, NdarrayOrTensor]:
-        
-        d = dict(data)
-        reference = d[self.reference_key]
-        resize = transforms.Resize(
-            reference.shape[1:],  # assumes channel first format
-            mode = self.mode, 
-            **self.resize_kwargs
-        )
-        for key in self.key_iterator(d):
-            d[key] = resize(d[key])
-        return d
-
-class RestoreOriginalSpacing(transforms.MapTransform):
-    """Match size of item to the size of a reference item"""
-    
-    def __init__(self, keys: KeysCollection, mode: str, allow_missing_keys: bool = False, **kwargs) -> None: 
-        super().__init__(keys=keys, allow_missing_keys=allow_missing_keys)
-        self.sp_resample = transforms.SpatialResample(mode=mode, **kwargs)
-
-    def __call__(self, data: Mapping[Hashable, NdarrayOrTensor]) -> Dict[Hashable, NdarrayOrTensor]:
-        d = dict(data)
-        for key in self.key_iterator(d):
-            d[key] = self.sp_resample(d[key], dst_affine = d[key].meta["original_affine"])
-        return d
