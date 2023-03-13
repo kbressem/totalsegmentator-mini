@@ -1,6 +1,5 @@
 ---
 imports:
-  - "$import glob"
   - "$import scripts"
   - "$from scripts.utils import get_datalist"
   - "$from scripts.utils import num_workers"
