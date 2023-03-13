@@ -14,9 +14,9 @@ python -m monai.bundle run inference \
   --meta_file configs/metadata.yaml \
   --config_file configs/inference.yaml \
   --logging_file configs/logging.conf
-  --datadir <path_to_file_or_folder>
+  --dataset_dir <path_to_file_or_folder>
 ```
-To run inference on a single file or a directory containing multiple image files use the `--datadir` flag. 
+To run inference on a single file or a directory containing multiple image files use the `--dataset_dir` flag. 
 Nested directories are not supported.   
 To control where the files are stored, overwrite the output directory with the `--outout_dir` flag. 
 
