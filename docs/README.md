@@ -11,7 +11,7 @@ This model was trained on the TotalSegmentator dataset as well as on 3500 additi
 
 ```bash
 python -m monai.bundle run inference \
-  --meta_file configs/metadata.yaml \
+  --meta_file configs/metadata.json \
   --config_file configs/inference.yaml \
   --logging_file configs/logging.conf \
   --dataset_dir <path_to_file_or_folder>
@@ -24,7 +24,7 @@ To control where the files are stored, overwrite the output directory with the `
 Evaluate the model on the official total segmentator training data (you need to download the data and adapt the paths beforehand). 
 ```bash
 python -m monai.bundle run evaluating \
-  --meta_file configs/metadata.yaml \
+  --meta_file configs/metadata.json \
   --config_file configs/evaluate.yaml \
   --logging_file configs/logging.conf
 ```
@@ -37,7 +37,7 @@ During training, this bundle saves both, the model weights AND the optimizer in 
 
 ```bash
 python -m monai.bundle run training \
-  --meta_file configs/metadata.yaml \
+  --meta_file configs/metadata.json \
   --config_file "['configs/train.yaml','configs/unet.yaml']" \
   --logging_file configs/logging.conf
 ```
@@ -46,7 +46,7 @@ python -m monai.bundle run training \
 
 ```bash
 torchrun --nnodes=1 --nproc_per_node=8 -m monai.bundle run training \
-  --meta_file configs/metadata.yaml \
+  --meta_file configs/metadata.json \
   --config_file "['configs/train.yaml','configs/unet.yaml','configs/multi_gpu_train.yaml']" \
   --logging_file configs/logging.conf
 ```
