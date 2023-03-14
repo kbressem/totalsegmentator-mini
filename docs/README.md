@@ -13,7 +13,7 @@ This model was trained on the TotalSegmentator dataset as well as on 3500 additi
 python -m monai.bundle run inference \
   --meta_file configs/metadata.yaml \
   --config_file configs/inference.yaml \
-  --logging_file configs/logging.conf
+  --logging_file configs/logging.conf \
   --dataset_dir <path_to_file_or_folder>
 ```
 To run inference on a single file or a directory containing multiple image files use the `--dataset_dir` flag. 

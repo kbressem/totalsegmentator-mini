@@ -11,7 +11,7 @@ ckpt_path: "models/model.pt"
 bundle_root: "./"
 output_dir: "$@bundle_root + 'eval'"
 dataset_dir: "$None"
-datalist: "$parse_data_for_inference(@datadir) or get_datalist('test')[0:1]"
+datalist: "$parse_data_for_inference(@dataset_dir) or get_datalist('test')[0:1]"
 device: "$torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')"
 network: "$@network_def.to(@device)"
 image_key: image
